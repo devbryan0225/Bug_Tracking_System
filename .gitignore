@@ -3,3 +3,13 @@
 ################################################################################
 
 /BugsAway/BugsAway.Web/Properties/PublishProfiles
+/BugsAway/BugsAway.API/Properties/PublishProfiles
+/BugsAway/BugsAway.Web/bin
+/BugsAway/BugsAway.Web/obj
+/BugsAway/BugsAway.API/bin
+/BugsAway/BugsAway.API/obj
+/BugsAway/BugsAway.API.Repository/bin
+/BugsAway/BugsAway.API.Repository/obj
+/BugsAway/BugsAway.Data/bin
+/BugsAway/BugsAway.Data/obj
+

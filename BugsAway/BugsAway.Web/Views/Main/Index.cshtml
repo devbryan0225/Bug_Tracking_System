@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome back, username</h1>
+    
+</div>
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" id="board-tab" data-toggle="tab" href="#board-container" role="tab" aria-controls="board-container" aria-selected="true">Board</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="list-tab" data-toggle="tab" href="#list-container" role="tab" aria-controls="list-container" aria-selected="true">List</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="project-tab" data-toggle="tab" href="#project-container" role="tab" aria-controls="project-container" aria-selected="true">Project</a>
+    </li>
+</ul>
+
+
+<div class="tab-content mt-4" id="myTabContent">
+    <div class="tab-pane fade show active" id="board-container" role="tabpanel" aria-labelledby="board-tab">
+        <partial name="Partial/Board.cshtml" />
+    </div>
+    <div class="tab-pane fade" id="list-container" role="tabpanel" aria-labelledby="list-tab">
+        <partial name="Partial/List.cshtml" />
+    </div>
+    <div class="tab-pane fade" id="project-container" role="tabpanel" aria-labelledby="project-tab">
+        <partial name="Partial/Projects.cshtml" />
+    </div>
+</div>
+
+@section Scripts {
+    
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        feather.replace()
+    </script>
+
+}
