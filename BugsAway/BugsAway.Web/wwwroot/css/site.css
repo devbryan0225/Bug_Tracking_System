@@ -55,6 +55,14 @@ button.accept-policy {
 
 /* Sticky footer styles
 -------------------------------------------------- */
+
+/* Custom
+-------------------------------------------------- */
+
+*:focus {
+    outline: none;
+}
+
 html {
     position: relative;
     min-height: 100%;
@@ -78,17 +86,51 @@ body {
     /*    min-width: 100vw;*/
 }
 
-#board {
+#board, #projects, #insights {
     flex-direction: column;
 }
 
-.card-add {
-    cursor: pointer;
-    border-style: dashed;
+
+    #insights > div > canvas {
+        height: 250px;
+    }
+
+.ticket-edit {
+    top: 0.5rem;
+    right: 1.5rem;
+    transition: all 0.6s ease;
+    opacity: 0;
+    cursor:pointer;
 }
+
+.ticket-edit > svg {
+    height: 1rem;
+}
+
+.ticket-close {
+    top: 0.3rem;
+    right: 0.5rem;
+    transition: all 0.3s ease;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.ticket-close:focus {
+    outline: none;
+}
+
+.ticket-card:hover .ticket-close, .ticket-card:hover .ticket-edit {
+    opacity: 1;
+}
+
+    .card-add {
+        cursor: pointer;
+        border-style: dashed;
+    }
 
     .card-add:hover {
         margin-top: -0.3rem;
+        margin-bottom : 0.3rem;
     }
 
 .card-shadow {
@@ -98,6 +140,32 @@ body {
     .card-shadow:hover {
         box-shadow: 0rem 0rem 1rem lightgray;
     }
+
+#board::-webkit-scrollbar {
+    cursor: pointer;
+    opacity: 0;
+    height: 0.5rem;
+    padding: 1rem 0;
+}
+
+#board::-webkit-scrollbar-thumb {
+    border-radius: 1rem;
+}
+
+#board:hover::-webkit-scrollbar {
+    opacity: 1;
+    background-color: lightgray;
+}
+
+#board:hover::-webkit-scrollbar-thumb {
+    background-color: grey;
+}
+
+
+tr {
+    transition: all 0.3s ease;
+}
+
 
 @media (min-width: 992px) {
     .status-container {
@@ -111,8 +179,23 @@ body {
         overflow-x: scroll;
     }
 
-    .project-container {
-        min-width: 18rem;
-        max-width: 25rem;
+    #projects {
+        flex-direction: row;
     }
+
+    #insights {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+        #insights > div > canvas {
+            height: 450px;
+        }
+
+
+        .project-container {
+            min-width: 18rem;
+            max-width: 25rem;
+        }
 }

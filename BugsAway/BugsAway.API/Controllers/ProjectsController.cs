@@ -32,7 +32,14 @@ namespace BugsAway.API.Controllers
                 ProjectId = p.ProjectId,
                 Title = p.Title,
                 Description = p.Description,
-                Feature = _context.Feature.Where(f => f.ProjectId == p.ProjectId).ToList()
+                Feature = _context.Feature.Select(f => new Feature { 
+                    ProjectId = f.ProjectId,
+                    FeatureId = f.FeatureId,
+                    Title = f.Title,
+                    Description = f.Description,
+                    Issue = _context.Issue.Where(i => i.FeatureId.Equals(f.FeatureId)).ToList()
+
+                }).Where(f => f.ProjectId == p.ProjectId).ToList()
             
             });
             

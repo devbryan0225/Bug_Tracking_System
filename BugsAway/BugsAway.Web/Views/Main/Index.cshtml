@@ -2,9 +2,12 @@
     ViewData["Title"] = "Home Page";
 }
 
+@model EmployeeViewModel
+@Html.HiddenFor(x => x.Employee.EmployeeId)
+@{TempData["EmpId"] = Model.Employee.EmployeeId;}
 <div class="text-center">
-    <h1 class="display-4">Welcome back, username</h1>
-    
+    <h1 class="display-4">Welcome back, @Model.Employee.Name</h1>
+
 </div>
 
 <ul class="nav nav-tabs">
@@ -33,7 +36,9 @@
 </div>
 
 @section Scripts {
-    
+
+    <script src="~/js/list.js"></script>
+    <script src="~/js/index.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <script>
         feather.replace()

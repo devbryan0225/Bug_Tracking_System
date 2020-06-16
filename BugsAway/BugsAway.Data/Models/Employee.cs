@@ -7,7 +7,6 @@ namespace BugsAway.API.Data.Models
     {
         public Employee()
         {
-            History = new HashSet<History>();
             Ticket = new HashSet<Ticket>();
         }
 
@@ -16,7 +15,6 @@ namespace BugsAway.API.Data.Models
         public string Name { get; set; }
 
         public virtual Role Role { get; set; }
-        public virtual ICollection<History> History { get; set; }
         public virtual ICollection<Ticket> Ticket { get; set; }
     }
 }

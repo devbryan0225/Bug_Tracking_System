@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Insights";
+}
+
+@*for each project, display issues per feature*@
+    <div class="container">
+
+
+        <div id="insights" class="">
+            <div class="mb-2">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="barChart" height="600"></canvas>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="mb-2">
+                <div class="card">
+                    <div class="card-body">
+                        <canvas id="pieChart" height="600"></canvas>
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+    </div>
+
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
+
+    <script>
+        LoadCharts();
+
+        function LoadCharts() {
+            let pie = document.getElementById("pieChart");
+            let bar = document.getElementById("barChart");
+
+            let data = {
+                datasets: [{
+                    data: [],
+                    backgroundColor: [],
+                    label : ""
+                }],
+                labels: []
+            };
+
+            let options = {
+                responsive: true
+            };
+
+            let myPieChart = new Chart(pie, {
+                type: 'pie',
+                data: data,
+                options: options
+            });
+
+            let myBarChart = new Chart(bar, {
+                type: 'bar',
+                data: data,
+                options: options
+            });
+
+
+            getProjectAsync()
+                .then(projects => projects.forEach(function (project) {
+
+                    data["datasets"][0]["data"] = project.feature.map(x => x.issue.length);
+                    data["labels"] = project.feature.map(x => x.title);
+
+                    data["datasets"]["label"] = project.title;
+
+                    for (var i = 0; i < project.feature.length; ++i) {
+                        data["datasets"][0]["backgroundColor"].push("#" + Math.floor(Math.random() * 16777215).toString(16));
+                    }
+
+                    myBarChart.update();
+                    myPieChart.update();
+                    
+                }));
+            
+            console.log(data);
+        }
+
+        
+
+    </script>
+
+}
+

@@ -28,7 +28,7 @@ namespace BugsAway.API
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-            //services.AddScoped<BugsAwayDBContext>();
+            
             services.AddDbContext<BugsAwayDBContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("BugsAwayDatabase")));
             services.AddCors(options =>
@@ -36,8 +36,9 @@ namespace BugsAway.API
                 options.AddPolicy("CorsPolicy",
                     builder =>                    
                         builder
-                        .WithOrigins("https://bugsaway.bryanyeo.dev")
+                        .WithOrigins("https://localhost:44349","https://bugsaway.bryanyeo.dev")
                         .AllowAnyHeader()
+                        .WithMethods("PUT","DELETE","GET")
                     );
             });
 
@@ -63,7 +64,7 @@ namespace BugsAway.API
 
             app.UseRouting();
 
-            app.UseCors();
+            app.UseCors("CorsPolicy");
 
             app.UseAuthorization();
 

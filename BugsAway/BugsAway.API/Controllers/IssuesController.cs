@@ -26,7 +26,20 @@ namespace BugsAway.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Issue>>> GetIssue()
         {
-            return await _context.Issue.ToListAsync();
+
+            var issues = await _context.Issue.ToListAsync();
+            var features = await _context.Feature.ToListAsync();
+            var projects = await _context.Project.ToListAsync();
+
+            foreach(var issue in issues)
+            {
+                issue.Feature = features
+                    .Where(x => x.FeatureId == issue.FeatureId).Single();
+                issue.Feature.Project = projects
+                    .Where(x => x.ProjectId == issue.Feature.ProjectId).Single();
+            }
+
+            return issues;
         }
 
         // GET: api/Issues/5

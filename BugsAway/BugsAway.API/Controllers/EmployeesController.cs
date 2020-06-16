@@ -26,7 +26,17 @@ namespace BugsAway.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployee()
         {
-            return await _context.Employee.ToListAsync();
+            var employees = await _context.Employee.ToListAsync();
+
+            var result = employees.Select(e => new Employee
+            {
+                EmployeeId = e.EmployeeId,
+                RoleId = e.RoleId,
+                Name = e.Name,
+                Role = _context.Role.Find(e.RoleId)
+            });
+
+            return result.ToList();
         }
 
         // GET: api/Employees/5

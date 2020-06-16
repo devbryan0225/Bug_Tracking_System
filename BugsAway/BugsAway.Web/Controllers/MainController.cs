@@ -18,7 +18,38 @@ namespace BugsAway.Web.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+       
         public IActionResult Index()
+        {
+            EmployeeViewModel model = null;
+            
+            if(Request.HasFormContentType)
+            {
+                if (Request.Form.ContainsKey("employeeId"))
+                {
+                    var id = Convert.ToInt32(Request.Form["employeeId"]);
+                    model = new EmployeeViewModel(id);
+                    TempData["EmpId"] = id;
+                }
+            } else if (TempData.ContainsKey("EmpId"))
+            {
+                model = new EmployeeViewModel((int)TempData["EmpId"]);
+            }
+            
+            if(model == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            return View(model);
+        }
+
+        public IActionResult Insights()
         {
             return View();
         }

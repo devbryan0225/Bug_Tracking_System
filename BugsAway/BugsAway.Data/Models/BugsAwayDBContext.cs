@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using BugsAway.API.Data.Models;
 
 namespace BugsAway.API.Data.Models
 {
@@ -32,8 +31,6 @@ namespace BugsAway.API.Data.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                //optionsBuilder.UseSqlServer("Server=.\\SQLExpress;Database=BugsAway.DB;user id=app_testing; password =p@ssw0rd;");
             }
         }
 
@@ -95,29 +92,11 @@ namespace BugsAway.API.Data.Models
                     .HasColumnName("date")
                     .HasColumnType("datetime");
 
-                entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
+                entity.Property(e => e.ModifiedBy).HasColumnName("modified_by");
 
                 entity.Property(e => e.StatusId).HasColumnName("status_id");
 
-                entity.Property(e => e.TaskId).HasColumnName("task_id");
-
-                entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.History)
-                    .HasForeignKey(d => d.EmployeeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_history_employee");
-
-                entity.HasOne(d => d.Status)
-                    .WithMany(p => p.History)
-                    .HasForeignKey(d => d.StatusId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_history_status");
-
-                entity.HasOne(d => d.Task)
-                    .WithMany(p => p.History)
-                    .HasForeignKey(d => d.TaskId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_history_task");
+                entity.Property(e => e.TicketId).HasColumnName("ticket_id");
             });
 
             modelBuilder.Entity<Issue>(entity =>
@@ -249,6 +228,10 @@ namespace BugsAway.API.Data.Models
                 entity.ToTable("ticket");
 
                 entity.Property(e => e.TicketId).HasColumnName("ticket_id");
+
+                entity.Property(e => e.CreatedBy)
+                    .HasColumnName("created_by")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
 

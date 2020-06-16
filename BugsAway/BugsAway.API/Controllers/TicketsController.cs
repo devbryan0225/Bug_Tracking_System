@@ -35,15 +35,11 @@ namespace BugsAway.API.Controllers
                 EmployeeId = t.EmployeeId,
                 PriorityId = t.PriorityId,
                 StatusId = t.StatusId,
-                Employee = _context.Employee
-                            .Where(x => x.EmployeeId == t.EmployeeId).Single(),
-                Issue = _context.Issue
-                            .Where(x => x.IssueId == t.IssueId).Single(),
-                Priority = _context.Priority
-                            .Where(x => x.PriorityId == t.PriorityId).Single(),
-                Status = _context.Status
-                            .Where(x => x.StatusId == t.StatusId).Single(),
-                History = t.History
+                Employee = _context.Employee.Find(t.EmployeeId),
+                Issue = _context.Issue.Find(t.IssueId),
+                Priority = _context.Priority.Find(t.PriorityId),
+                Status = _context.Status.Find(t.StatusId)
+                
 
             });
 
@@ -68,8 +64,8 @@ namespace BugsAway.API.Controllers
         // PUT: api/Tickets/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTicket(int id, Ticket ticket)
+        [HttpPut("{id}/{userId}")]
+        public async Task<IActionResult> PutTicket(int id, int userId, Ticket ticket)
         {
             if (id != ticket.TicketId)
             {
@@ -78,9 +74,19 @@ namespace BugsAway.API.Controllers
 
             _context.Entry(ticket).State = EntityState.Modified;
 
+            _context.History.Add(new History
+            {
+                Date = DateTime.Now,
+                TicketId = ticket.TicketId,
+                StatusId = ticket.StatusId,
+                ModifiedBy = userId
+            });
+
+
             try
             {
                 await _context.SaveChangesAsync();
+
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -97,15 +103,34 @@ namespace BugsAway.API.Controllers
             return NoContent();
         }
 
-        [EnableCors("CorsPolicy")]
         // POST: api/Tickets
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
+        [HttpPost("{userId}")]
+        public async Task<ActionResult<Ticket>> PostTicket(int userId, Ticket ticket)
         {
+
             _context.Ticket.Add(ticket);
+
             await _context.SaveChangesAsync();
+
+            _context.History.Add(new History
+            {
+                Date = DateTime.Now,
+                TicketId = ticket.TicketId,
+                StatusId = ticket.StatusId,
+                ModifiedBy = userId
+            });
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
 
             return CreatedAtAction("GetTicket", new { id = ticket.TicketId }, ticket);
         }
@@ -121,7 +146,15 @@ namespace BugsAway.API.Controllers
             }
 
             _context.Ticket.Remove(ticket);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
             return ticket;
         }

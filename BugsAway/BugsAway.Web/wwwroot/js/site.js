@@ -3,69 +3,130 @@
 
 // Write your JavaScript code.
 
-const apiUrl = "https://api.bugsaway.bryanyeo.dev/";
+
+const apiUrl = "https://localhost:44301/api/";
 
 async function getStatusAsync() {
-    let response = await fetch(apiUrl +"api/status/");
+    let response = await fetch(apiUrl + "status/");
     let data = await response.json();
     return data;
 }
 
 async function getProjectAsync() {
-    let response = await fetch(apiUrl +"api/projects/");
+    let response = await fetch(apiUrl + "projects/");
     let data = await response.json();
     return data;
 }
 
-async function getTicketAsync() {
-    let response = await fetch(apiUrl +"api/tickets/");
+async function getTicketAsync(id = "") {
+    let response = await fetch(`${apiUrl}tickets/${id}`);
     let data = await response.json();
     return data;
 }
 
 async function getIssueAsync() {
-    let response = await fetch(apiUrl +"api/issues/");
+    let response = await fetch(apiUrl + "issues/");
     let data = await response.json();
     return data;
 }
 
 async function getEmployeeAsync() {
-    let response = await fetch(apiUrl +"api/employees/");
+    let response = await fetch(apiUrl + "employees/");
     let data = await response.json();
     return data;
 }
 
 async function getPriorityAsync() {
-    let response = await fetch(apiUrl +"api/priorities/");
+    let response = await fetch(apiUrl + "priorities/");
     let data = await response.json();
     return data;
 }
 
-// ----------- Common Functions ----------- 
+async function getFeatureAsync() {
+    let response = await fetch(apiUrl + "features/");
+    let data = await response.json();
+    return data;
+}
+
+async function postTicketAsync(userId, data) {
+    let response = await fetch(`${apiUrl}tickets/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    //let resp = await response.json();
+    return response;
+
+}
+
+async function postIssueAsync(data) {
+    let response = await fetch(`${apiUrl}issues/`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    //let resp = await response.json();
+    return response;
+
+}
+
+async function updateTicketAsync(id, modId, data) {
+    let response = await fetch(`${apiUrl}tickets/${id}/${modId}`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    //let resp = await response.json();
+    return response;
+
+}
+
+async function deleteTicketAsync(id) {
+    let response = await fetch(`${apiUrl}tickets/${id}`, {
+        method: 'DELETE'
+    });
+
+    return response;
+};
 
 function CreateElement(elementName = "div", className = null, content = null, href = null) {
     let element = document.createElement(elementName);
-    element.className = className;
+    if (className !== null) { element.className = className; }
     element.textContent = content;
     if (href !== null) { element.href = href; }
     return element;
 }
 
 function CreateStatusSection(status) {
-    let container = CreateElement("div","status-container card text-center m-1");
-    let header = CreateElement("div","card-header", status.title);
-    
+    let container = CreateElement("div", "status-container text-center m-1");
+    let statusCard = CreateElement("div", "card bg-secondary");
+    let statusCardBody = CreateElement("div", "card-body");
+    let header = CreateElement("h5", "card-text text-white", status.title);
+    statusCardBody.appendChild(header);
+    statusCard.appendChild(statusCardBody);
+
     let body = CreateElement("div", "card-body");
     body.dataset.statusid = status.statusId;
-    body.appendChild(CreateAddButton(`${status.title} Ticket`));
-    container.appendChild(header);  
+    body.appendChild(CreateAddButton(`${status.title} Ticket`, status.statusId, `Add New '${status.title}' Ticket`));
+    container.appendChild(statusCard);
     container.appendChild(body);
-    
+
     return container;
 }
 
 function CreateProjectSection(project) {
-    let container = CreateElement("div","card project-container m-2 card-shadow");
+    let container = CreateElement("div", "card project-container m-2 card-shadow");
     let image = document.createElement("img");
     image.src = "/img/monitoring-well.jpg";
     image.className = "card-img-top";
@@ -73,7 +134,7 @@ function CreateProjectSection(project) {
     summary.appendChild(CreateElement("h5", "card-title", project.title));
     summary.appendChild(CreateElement("p", "card-text", project.description));
 
-    let action = CreateElement("div","card-body");
+    let action = CreateElement("div", "card-body");
     action.appendChild(CreateElement("a", "card-link", "Add Features", href = "#"));
 
     let list = CreateElement("ul", "list-group list-group-flush");
@@ -90,13 +151,46 @@ function CreateProjectSection(project) {
 }
 
 function CreateTickets(ticket) {
-    let container = CreateElement("div", `card small text-left card-shadow text-white ${priorityClass[ticket.priority.priorityId]}`);
+    let container = CreateElement("div", `card small text-left mb-2 card-shadow text-white ticket-card ${priorityClass[ticket.priority.priorityId]}`);
+    container.dataset.issue = ticket.issue.issueId;
+    container.dataset.employee = ticket.employee.employeeId;
+    container.dataset.priority = ticket.priority.priorityId;
+    container.dataset.status = ticket.status.statusId;
 
     let body = CreateElement("div", "card-body");
-    let title = CreateElement("h5", "card-title", ticket.issue.title);
+
+    let title = CreateElement("h5", "card-title", `0${ticket.ticketId} ${ticket.issue.title}`);
     let text = CreateElement("p", "card-text", ticket.issue.description);
+    let label = CreateElement("label", "", ticket.employee.name);
+    let close = CreateElement("button", "close position-absolute text-white ticket-close");
+    close.setAttribute("type", "button");
+    close.setAttribute("aria-label", "Close");
+    close.dataset.action = "Delete";
+    close.dataset.origin = "ticket-card";
+    close.dataset.value = ticket.ticketId;
+    close.dataset.toggle = "modal";
+    close.dataset.target = "#actionModal";
+    let closeIcon = CreateElement("span", "", "×");
+    closeIcon.setAttribute("aria-hidden", "true");
+    close.appendChild(closeIcon);
+
+    let edit = CreateElement("div", "position-absolute text-white ticket-edit");
+    edit.dataset.action = "Edit";
+    edit.dataset.origin = "ticket-card";
+    edit.dataset.value = ticket.ticketId;
+    edit.dataset.toggle = "modal";
+    edit.dataset.target = "#actionModal";
+
+    let editIcon = document.createElement("i");
+    editIcon.dataset.feather = "edit";
+    editIcon.style.color = "white";
+    edit.appendChild(editIcon);
+
     body.appendChild(title);
     body.appendChild(text);
+    body.appendChild(label);
+    container.appendChild(edit);
+    container.appendChild(close);
     container.appendChild(body);
     return container;
 }
@@ -107,13 +201,15 @@ const priorityClass = {
     3: "bg-info"
 }
 
-function CreateAddButton(origin = "") {
+function CreateAddButton(origin = "", value = null, tooltip = "") {
     let container = CreateElement("div", "card card-add card-shadow");
+    container.setAttribute("title", tooltip);
     let body = CreateElement("div", "card-body d-flex justify-content-center align-items-center");
     body.dataset.toggle = "modal";
     body.dataset.target = "#actionModal";
     body.dataset.action = "Create New";
     body.dataset.origin = origin;
+    body.dataset.value = value;
 
     let icon = document.createElement("i");
     icon.dataset.feather = "plus-circle";
@@ -124,142 +220,32 @@ function CreateAddButton(origin = "") {
     return container;
 }
 
-function CreateFormGroup(id = "", title = "", list = null, optionValue = null, optionText = null) {
+function CreateFormGroup(type = "", id = "", title = "", list = null, optionValue = null, optionText = null, selectedId = null) {
     let container = CreateElement("div", "form-group");
     let label = CreateElement("label", "col-form-label", title);
-    label.setAttribute("for",id);
-    let select = CreateElement("select", "form-control selectpicker");
-    select.id = id;
+    label.setAttribute("for", id);
+    let formType = CreateElement(type, "form-control");
+    formType.id = id;
 
-    list.forEach(function (item) {
+
+    if (type === "select") {
+        list.forEach(function (item) {
+
+            let option = CreateElement("option", "", item[optionText]);
+            option.value = item[optionValue];
+            if (parseInt(option.value, 10) === selectedId) { option.selected = true; }
+
+            formType.appendChild(option);
+        });
+    } else if (type === "input") {
+        formType.setAttribute("type", "text");
+    }
         
-        let option = CreateElement("option","", item[optionText] );
-        option.value = item[optionValue];
-        
-        select.appendChild(option);
-    });
 
     container.appendChild(label);
-    container.appendChild(select);
+    container.appendChild(formType);
 
     return container;
 }
 
-function CreateTicketForm() {
-    let container = document.getElementById("modal-form");
-    getIssueAsync()
-        .then(data => container
-                .appendChild(CreateFormGroup("select-issue", "Issue", data, "issueId", "title")));
-    getEmployeeAsync()
-        .then(data => container
-            .appendChild(CreateFormGroup("select-employee", "Employee", data, "employeeId", "name")));
-    getPriorityAsync()
-        .then(data => container
-            .appendChild(CreateFormGroup("select-priority", "Priority", data, "priorityId", "title")));
-    getStatusAsync()
-        .then(data => container
-            .appendChild(CreateFormGroup("select-status", "Status", data, "statusId", "title")));
 
-
-    return container;
-}
-
-// -------------------------------------------
-
-function PopulateBoard() {
-    const board = document.getElementById("board");
-    board.innerHTML = "";
-
-    getStatusAsync()
-        .then(data => data.forEach(function (status) {
-            board.appendChild(CreateStatusSection(status));
-            feather.replace();
-        }));        
-}
-
-function PopulateProjects() {
-    const container = document.getElementById("projects");
-    
-    getProjectAsync()
-        .then(data => data.forEach(function (project) {
-            container.prepend(CreateProjectSection(project));
-        }));
-}
-
-function PopulateTickets() {
-
-    getTicketAsync()
-        .then(data => data.forEach(function (ticket) {
-            console.log(ticket);
-            let target = document.querySelector(`div[data-statusid = '${ticket.status.statusId}']`);
-            target.prepend(CreateTickets(ticket));
-        }));
-}
-
-function InitializeComponents() {
-    PopulateBoard();
-    PopulateProjects();
-    PopulateTickets();
-
-    document.getElementById("projects").appendChild(CreateAddButton("Project"));
-    feather.replace();
-}
-
-window.onload = InitializeComponents
-
-$('#actionModal').on('show.bs.modal', function (event) {
-    let button = $(event.relatedTarget)
-    let action = button.data('action')
-    let origin = button.data('origin')
-    
-    let modal = $(this)
-    modal.find('.modal-title').text(`${action} ${origin}`)
-        
-    document.getElementById("modal-form").innerHTML = "";
-    if (origin.toLowerCase().includes("ticket")) {
-        CreateTicketForm();
-    }
-
-})
-
-document.getElementById("btn-modal").onclick = function () {
-    let employeeId = document.getElementById('select-employee').value;
-    let issueId = document.getElementById('select-issue').value;
-    let priorityId = document.getElementById('select-priority').value;
-    let statusId = document.getElementById('select-status').value;
-
-    data = {}
-
-    data["employeeId"] = employeeId;
-    data["issueId"] = issueId;
-    data["priorityId"] = priorityId;
-    data["statusId"] = statusId;
-    
-    postTicketAsync(data).then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            alert('Success:', data);
-            PopulateBoard();
-            PopulateTickets();
-        })
-        .catch(data => {
-            console.log('Error:', data);
-            alert('Error:', data);
-        });
-    
-};
-
-async function postTicketAsync(data) {
-    let response = await fetch(apiUrl+'api/tickets/', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-
-    //let resp = await response.json();
-    return response;
-        
-}

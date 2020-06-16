@@ -26,7 +26,21 @@ namespace BugsAway.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Feature>>> GetFeature()
         {
-            return await _context.Feature.ToListAsync();
+
+            var features = await _context.Feature.ToListAsync();
+
+            var result = features.Select(f => new Feature
+            {
+                FeatureId = f.FeatureId,
+                Title = f.Title,
+                Description = f.Description,
+                ProjectId = f.ProjectId,
+                Project = _context.Project.Find(f.ProjectId),
+                Issue = _context.Issue.Where(x => x.FeatureId.Equals(f.FeatureId)).ToList()
+            });
+
+            return result.ToList();
+
         }
 
         // GET: api/Features/5

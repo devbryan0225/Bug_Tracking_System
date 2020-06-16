@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Welcome to BugsAway";
+}
+
+@model LoginViewModel
+    <div class="d-flex justify-content-center align-items-center" style="height:30rem;">
+        <form class="d-flex flex-column" asp-controller="main" asp-action="Index" method="post">
+            <div id="" class="form-inline mb-2">
+
+                <div class="form-group">
+                    <label class="mr-2" for="select-login-employee">User : </label>
+                    <select class="form-control mr-2" id="select-login-employee" asp-for="EmployeeId">
+                    </select>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+    
+
+@section Scripts {
+    <script src="~/js/login.js"></script>
+
+}
