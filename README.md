@@ -9,3 +9,9 @@ Stack
 Functionalities
 - Users can add, edit, and remove tickets.
 - Users can add, edit, and remove issues.
+
+Preview
+- https://bugsaway.bryanyeo.dev/
+
+SRS Plan
+- https://docs.google.com/document/d/12ctrmKsumyLB84wNPev6YrRU7YQeuR-Gzq57s8FsE7w/edit?usp=sharing
